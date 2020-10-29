@@ -1,4 +1,9 @@
 #pragma once
 #include <iostream>
+#include <time.h>
 
-void test();
+namespace exception{
+	void error(std::string modual, std::string msg);
+	void warning(std::string modual, std::string msg);
+}
+
