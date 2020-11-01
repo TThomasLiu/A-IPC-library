@@ -44,11 +44,18 @@ namespace utility{
 		int lock(int timeout);
 
 		/*unlock the spin lock
-		* return value::
+		* return value:
 		* 0: success
 		* -1: lock id mismatch
 		*/
 		int unlock(int lockId);
+
+		/*check if the lock is locked
+		* return value:
+		* 0: success
+		* -1: timeout
+		*/
+		int chklock(int timeout);
 
 	public://constructor & destructor
 
@@ -66,6 +73,9 @@ namespace utility{
 		* sleepTime: the sleep duration in busy waiting loop
 		*/
 		spinLock(volatile bool* lock, int switchDelay, int sleepTime);
+
+		/*destructor
+		*/
 		~spinLock();
 	};
 

@@ -34,6 +34,20 @@ int utility::spinLock::unlock(int lockId)
 	return 0;
 }
 
+int utility::spinLock::chklock(int timeout)
+{
+	int start = clock();
+	while (timeout == INFINITE || (clock() - start) < timeout) {
+		if (clock() - start > _switchDelay) {
+			Sleep(_sleepTime);
+		}
+		if (!*_lock) {
+			return 0;
+		}
+	}
+	return -1;
+}
+
 utility::spinLock::spinLock(volatile bool* lock) {
 	//input check
 	if (lock == NULL) {
