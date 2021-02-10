@@ -79,9 +79,27 @@ namespace utility{
 		~spinLock();
 	};
 
+	/*semaphore
+	***description***
+	*the semaphore with lock
+	* the lock will block the requests
+	*/
+	class semaphore {
+	private:
+		volatile int _counter;
+		volatile bool _lockVar;
+		spinLock spinlock{ &_lockVar };
+
+	public:
+
+	};
 }
 
 namespace internal {
+	/*internal communication share memory
+	***description***
+	*the internal shared memory controling class
+	*/
 	class internalCommShareMem {
 	private:
 		bool _allocFlag = false;
