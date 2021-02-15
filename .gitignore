@@ -33,5 +33,6 @@
 
 #Visual Studio Config
 Debug
+Release
 .vs
 
