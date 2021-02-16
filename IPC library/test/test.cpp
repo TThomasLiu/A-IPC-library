@@ -65,6 +65,10 @@ void recvSubThread(void* param) {
 	std::cout << "recv sub thread end\n";
 }
 
+void serialTest() {
+
+}
+
 void threadManagerTest() {
 	threadManager t;
 	timers::highResTimer timer;
@@ -139,16 +143,11 @@ int main() {
 	long long int totalSize = 0;
 	std::cout << "start" << std::endl;
 	//threadManagerTest();
-	for(int i=0;i<5;i++)
+	//for(int i=0;i<5;i++)
 	//cirBuffTest();
-	cirBuffMultithreadTest();
-	timer.start();
-	for (int i = 0; i < testRound; i++) {
-		memcpy(&a, &b, sizeof(speedTestPacket));
-		totalSize += sizeof(speedTestPacket);
-	}
-	timer.stop();
-	std::cout << "memcpy speed: " << totalSize / timer.getMicroSecond() << "MBytes / sec" << std::endl;
+	//cirBuffMultithreadTest();
+	
+	serialTest();
 	std::cout << "end" << std::endl;
 	return 0;
 }

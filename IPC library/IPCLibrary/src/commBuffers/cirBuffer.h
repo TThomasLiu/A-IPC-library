@@ -5,7 +5,6 @@
 
 #include "..\utilitiesConstants.h"
 
-
 class cirBuffer {
 private://private struct
 	struct dataHeader {
@@ -34,6 +33,8 @@ public://con / destructor
 	~cirBuffer();
 
 private://private functions
+	virtual void _createBuffer();
+	virtual void _deleteBuffer();
 	void _reset();
 	
 	responseConst _waitForSpace(unsigned int dataSize);
@@ -57,3 +58,4 @@ public://public functions
 	responseConst peek(void* data, int dataSize, unsigned int* fetchSize, unsigned int timeoutOverride, unsigned int busyLimitOverride);
 
 };
+

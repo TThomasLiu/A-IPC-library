@@ -8,8 +8,8 @@ cirBuffer::cirBuffer(unsigned int bufferSize, unsigned int timeout, unsigned int
 
 	_remainLen.store(_bufferSize);
 	
-	_buffer = (char*)malloc(_bufferSize);
-	
+	_createBuffer();
+
 	_readHead = _buffer;
 	_writeHead = _buffer;
 	_endHead = _buffer+_bufferSize;
@@ -18,6 +18,16 @@ cirBuffer::cirBuffer(unsigned int bufferSize, unsigned int timeout, unsigned int
 }
 
 cirBuffer::~cirBuffer()
+{
+	_deleteBuffer();
+}
+
+void cirBuffer::_createBuffer()
+{
+	_buffer = (char*)malloc(_bufferSize);
+}
+
+void cirBuffer::_deleteBuffer()
 {
 	delete[] _buffer;
 }

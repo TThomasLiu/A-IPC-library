@@ -140,13 +140,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="IPCLibrary.h" />
-    <ClInclude Include="src\circularBuffer\cirBuffer.h" />
+    <ClInclude Include="src\commBuffers\cirBuffer.h" />
     <ClInclude Include="src\multithread\multithread.h" />
     <ClInclude Include="src\timer\timer.h" />
     <ClInclude Include="src\utilitiesConstants.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\circularBuffer\cirBuffer.cpp" />
+    <ClCompile Include="src\commBuffers\cirBuffer.cpp" />
     <ClCompile Include="src\multithread\multithread.cpp" />
     <ClCompile Include="src\timer\timer.cpp" />
   </ItemGroup>
