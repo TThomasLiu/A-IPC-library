@@ -2,11 +2,28 @@
 #include "IPCLibrary.h"
 #include "src/timer/timer.h"
 
-#define testRound 10000000
+#define testRound 1000000
 
 struct speedTestPacket {
 	char payload[128];
 };
+
+void bufferOpTest() {
+	int send = 0;
+	int recv;
+	unsigned int recvSize;
+	bufferPair<cirBuffer> bp(1000, 100, 10);
+
+	bufferOperator<cirBuffer>* a;
+	bufferOperator<cirBuffer>* b;
+
+	a = bp.getBuffer();
+	b = bp.getBuffer();
+	a->push(&send, sizeof(int));
+	b->fetch(&recv, sizeof(int), &recvSize);
+
+	std::cout << "recv: " << recv << std::endl;
+}
 
 void testSubThread(void* param) {
 	int* a = *(int**)param;
@@ -44,6 +61,7 @@ void recvSubThread(void* param) {
 	responseConst res;
 	timers::highResTimer timer;
 	speedTestPacket packet;
+	speedTestPacket* recv2;
 	int recv;
 	unsigned int recvSize;
 	long long int totalRecvSize = 0;
@@ -51,10 +69,12 @@ void recvSubThread(void* param) {
 	timer.start();
 	for (int i = 0; i < testRound; i++) {
 		res = buffer->fetch(&packet, sizeof(speedTestPacket), &recvSize);
+		//res = buffer->fetch((void**)&recv2, &recvSize);
 		if (res != responseConst::success) {
 			std::cout << "recv res: " << res << std::endl;
 		}
 		totalRecvSize += recvSize;
+		//delete recv2;
 	}
 
 	timer.stop();
@@ -101,7 +121,7 @@ void cirBuffTest() {
 	for (int i = 0; i < 100; i++) {
 		send = i;
 		res = t.push(&send, sizeof(int));
-		std::cout << "send: " << send << "res: " << res << std::endl;;
+	//	std::cout << "send: " << send << "res: " << res << std::endl;;
 	}
 
 	for (int i = 0; i < 100; i++) {
@@ -146,8 +166,8 @@ int main() {
 	//for(int i=0;i<5;i++)
 	//cirBuffTest();
 	//cirBuffMultithreadTest();
-	
-	serialTest();
+	bufferOpTest();
+	//serialTest();
 	std::cout << "end" << std::endl;
 	return 0;
 }

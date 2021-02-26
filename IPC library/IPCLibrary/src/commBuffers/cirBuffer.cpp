@@ -17,9 +17,15 @@ cirBuffer::cirBuffer(unsigned int bufferSize, unsigned int timeout, unsigned int
 	_status = statusConst::initialized;
 }
 
+cirBuffer::cirBuffer()
+{
+}
+
 cirBuffer::~cirBuffer()
 {
-	_deleteBuffer();
+	if (_status != statusConst::notInitialized) {
+		_deleteBuffer();
+	}
 }
 
 void cirBuffer::_createBuffer()
