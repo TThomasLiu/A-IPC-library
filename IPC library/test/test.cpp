@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string.h>
 #include "IPCLibrary.h"
 #include "src/timer/timer.h"
 
@@ -8,21 +9,90 @@ struct speedTestPacket {
 	char payload[128];
 };
 
+void buffOpSendSubthreadPrint(void* param) {
+	char scrBuff[1001];
+	unsigned int fetchSize;
+	bufferOperator<cirBuffer>* buff = *(bufferOperator<cirBuffer>**)param;
+	while (1) {
+		buff->fetch(scrBuff, 1000, &fetchSize, INFINITE, 10);
+		scrBuff[fetchSize] = 0;
+		buff->push(scrBuff, fetchSize);
+		std::cout << scrBuff << std::endl;
+	}
+
+}
+
+void buffOpSendSubthreadCtrl(void* param) {
+	timers::highResTimer timerTotal;
+	timers::highResTimer timerSend;
+	timers::highResTimer timerRecv;
+	char scrBuff[1001];
+	char read[1001];
+	unsigned int fetchSize;
+	bufferOperator<cirBuffer>* buff = *(bufferOperator<cirBuffer>**)param;
+	while (1) {
+		std::cin >> read;
+		timerTotal.start();
+		timerSend.start();
+		buff->push(read, strlen(read));
+		timerSend.stop();
+		timerRecv.start();
+		buff->fetch(scrBuff, 1000, &fetchSize, INFINITE, 10);
+		timerRecv.stop();
+		timerTotal.stop();
+		scrBuff[fetchSize] = 0;
+		std::cout << "echoed : " << scrBuff << std::endl;
+		std::cout << "msg round trip cost " << timerTotal.getMicroSecond() << "us" << std::endl;
+		std::cout << "msg send cost " << timerSend.getMicroSecond() << "us" << std::endl;
+		std::cout << "msg recv cost " << timerRecv.getMicroSecond() << "us" << std::endl;
+	}
+
+}
+
+void buffOpMultithreadTest() {
+	threadManager scr;
+	threadManager read;
+	bufferPair<cirBuffer> bp(10000, 1000, 10);
+	bufferOperator<cirBuffer>* screr;
+	bufferOperator<cirBuffer>* reader;
+	
+	screr = bp.getBuffer();
+	reader = bp.getBuffer();
+
+	scr.loadThreadParameter(buffOpSendSubthreadPrint, &screr, sizeof(bufferOperator<cirBuffer>*));
+	read.loadThreadParameter(buffOpSendSubthreadCtrl, &reader, sizeof(bufferOperator<cirBuffer>*));
+	scr.startThread();
+	read.startThread();
+	scr.joinThread();
+	read.joinThread();
+}
+
 void bufferOpTest() {
 	int send = 0;
 	int recv;
 	unsigned int recvSize;
 	bufferPair<cirBuffer> bp(1000, 100, 10);
-
 	bufferOperator<cirBuffer>* a;
 	bufferOperator<cirBuffer>* b;
 
+	responseConst res;
+
 	a = bp.getBuffer();
 	b = bp.getBuffer();
-	a->push(&send, sizeof(int));
-	b->fetch(&recv, sizeof(int), &recvSize);
+	for (int i = 0; i < 100000; i++) {
+		res = a->push(&i, sizeof(int));
+		//std::cout << res << " a push: " << i << std::endl;
+		res = b->fetch(&recv, sizeof(int), &recvSize);
+		//std::cout << res << " b recv: " << recv << std::endl;
 
-	std::cout << "recv: " << recv << std::endl;
+
+		res = b->push(&i, sizeof(int));
+		//std::cout << res << " b push: " << i << std::endl;
+		res = a->fetch(&recv, sizeof(int), &recvSize);
+		//std::cout << res << " a recv: " << recv << std::endl;
+
+	}
+
 }
 
 void testSubThread(void* param) {
@@ -83,10 +153,6 @@ void recvSubThread(void* param) {
 	printf("recv %f msg/sec\n", testRound / timer.getSecond());
 	std::cout << "recv testRound in:" << timer.getMicroSecond() << "us" << std::endl;
 	std::cout << "recv sub thread end\n";
-}
-
-void serialTest() {
-
 }
 
 void threadManagerTest() {
@@ -166,8 +232,9 @@ int main() {
 	//for(int i=0;i<5;i++)
 	//cirBuffTest();
 	//cirBuffMultithreadTest();
-	bufferOpTest();
+	//bufferOpTest();
 	//serialTest();
+	buffOpMultithreadTest();
 	std::cout << "end" << std::endl;
 	return 0;
 }
